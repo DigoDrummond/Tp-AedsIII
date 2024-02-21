@@ -86,82 +86,79 @@ class Netflix {
                 dados[i] = "não informado";
             }
         }
-
-        String data[] = dados[4].split(" ");
-        data[1].replace(",", "");
-        if(data[1].length() == 1){
-            data[1] = "0" + data[1];
-        }
-
-        switch (data[0]) {
-            case "January":
-                data[0] = "01";
-                break;
-        
-            case "February":
-                data[0] = "02";
-                break;
-
-            case "March":
-                data[0] = "03";
-                break;
-            
-            case "April":
-                data[0] = "04";
-                break;
-            
-            case "May":
-                data[0] = "05";
-                break;
-            
-            case "June":
-                data[0] = "06";
-                break;
-
-            case "July":
-                data[0] = "07";
-                break;
-
-            case "August":
-                data[0] = "08";
-                break;
-
-            case "September":
-                data[0] = "09";
-                break;
-
-            case "October":
-                data[0] = "10";
-                break;
-
-            case "November":
-                data[0] = "11";
-                break;
-
-            case "December":
-                data[0] = "12";
-                break;
-            
-            default:
-                break;
-        }
-
-        String dataFormatada = data[1] + "-" + data[0] + "-" + data[2];
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        Date dataFormatada2 = new Date();
+        String data = formatarData(dados[4]);
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Date dataFormatada = new Date();
         long unixTime = 0;
-        try {
-            dataFormatada2 = sdf.parse(dataFormatada);
-            unixTime = dataFormatada2.getTime();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        try{
+            dataFormatada = sdf.parse(data);
+            unixTime = dataFormatada.getTime();
+        }catch(Exception e){
+            e.printStackTrace();
+            e.getMessage();
         }
+        
+
+        
 
         setId(Integer.parseInt(dados[0]));
         setType(dados[1]);
         setTitle(dados[2]);
         setDirector(dados[3]);
         setDate(unixTime);
+
+    }
+
+    private static String formatarData(String dataOriginal) {
+        String[] partes = dataOriginal.split(" ");
+        String mes = partes[0];
+        String dia = partes[1].replace(",", ""); // Remove a vírgula do dia
+        String ano = partes[2];
+        
+        // Convertendo o mês para o formato numérico (assumindo inglês para português)
+        switch (mes) {
+            case "January":
+                mes = "01";
+                break;
+            case "February":
+                mes = "02";
+                break;
+            case "March":
+                mes = "03";
+                break;
+            case "April":
+                mes = "04";
+                break;
+            case "May":
+                mes = "05";
+                break;
+            case "June":
+                mes = "06";
+                break;
+            case "July":
+                mes = "07";
+                break;
+            case "August":
+                mes = "08";
+                break;
+            case "September":
+                mes = "09";
+                break;
+            case "October":
+                mes = "10";
+                break;
+            case "November":
+                mes = "11";
+                break;
+            case "December":
+                mes = "12";
+                break;
+            default:
+                // Se o mês não estiver em inglês, retornar a data original
+                return dataOriginal;
+        }
+        
+        return dia + "/" + mes + "/" + ano;
     }
     
     public byte[] toByteArray() throws IOException{
