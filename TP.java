@@ -80,37 +80,53 @@ class Netflix {
     }
 
     public void ler(String linha) {
-        String[] dados = linha.split(";");
-        for(int i=0;i<dados.length;i++){
-            if(dados[i] == ""){
-                dados[i] = "não informado";
+        int j = 0;
+		char c = ';';
+		int tmp = 0;
+		String vetorStr[] = new String[5];
+		for(int i=0; i<linha.length(); i++){
+			if(linha.charAt(i) == c) {
+				vetorStr[j] =linha.substring(tmp, i);
+				tmp = i+1;
+				if(vetorStr[j].intern() == ""){
+					vetorStr[j] = "nao informado";
+				}
+				j++;
+			}
+		}
+		vetorStr[4] =linha.substring(tmp, linha.length());
+        if(vetorStr[4].intern() == ""){
+            setDate(0);
+		} else {
+            String data = formatarData(vetorStr[4]);
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            Date dataFormatada = new Date();
+            long unixTime = 0;
+            try{
+                dataFormatada = sdf.parse(data);
+                unixTime = dataFormatada.getTime();
+            }catch(Exception e){
+                e.printStackTrace();
+                e.getMessage();
             }
-        }
-        String data = formatarData(dados[4]);
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        Date dataFormatada = new Date();
-        long unixTime = 0;
-        try{
-            dataFormatada = sdf.parse(data);
-            unixTime = dataFormatada.getTime();
-        }catch(Exception e){
-            e.printStackTrace();
-            e.getMessage();
+            setDate(unixTime);
         }
         
-
-        
-
-        setId(Integer.parseInt(dados[0]));
-        setType(dados[1]);
-        setTitle(dados[2]);
-        setDirector(dados[3]);
-        setDate(unixTime);
+        setId(Integer.parseInt(vetorStr[0]));
+        setType(vetorStr[1]);
+        setTitle(vetorStr[2]);
+        setDirector(vetorStr[3]);
 
     }
 
     private static String formatarData(String dataOriginal) {
         String[] partes = dataOriginal.split(" ");
+        if(partes[0].equals("")){
+            partes[0] = partes[1];
+            partes[1] = partes[2];
+            partes[2] = partes[3];
+            partes[3] = null;
+        }
         String mes = partes[0];
         String dia = partes[1].replace(",", ""); // Remove a vírgula do dia
         String ano = partes[2];
@@ -165,7 +181,6 @@ class Netflix {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
 
-        
         dos.writeInt(id);
         dos.writeUTF(type);
         dos.writeUTF(title);
@@ -188,7 +203,6 @@ class Netflix {
 }
 
 public class TP {
-
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         FileOutputStream arqByte;
@@ -204,7 +218,7 @@ public class TP {
             
 
             arq.readLine();
-            while (arq.ready()) {
+            while(arq.ready()) {
                 Netflix programa = new Netflix();
                 programa.ler(arq.readLine());
                 
@@ -212,6 +226,7 @@ public class TP {
                 dos.writeInt(ba.length);
                 dos.write(ba);
             }
+
             dos.close();
             arqByte.close();
             arq.close();
