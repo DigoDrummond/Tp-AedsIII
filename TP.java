@@ -29,7 +29,7 @@ public class TP {
                 
                 ba = programa.toByteArray();
                 dos.writeBoolean(false);
-                dos.writeInt(ba.length);
+                dos.writeShort(ba.length);
                 dos.write(ba);
             }
 
@@ -44,22 +44,26 @@ public class TP {
         System.out.println(" Escolha uma das opções: ");
         System.out.println("1) Adicionar novo registro na base de dados.\n2) Ler registro da base.\n3) Atualizar registro.\n4) Deletar registro. ");
         
-        // switch (sc.nextInt()) {
-        //     case 1:
-        //         create();
+        switch (sc.nextInt()) {
+            case 1:
+                System.out.println("#------------------------------------#\nAdicionar novo registro na base de dados.");
+                create();
 
-        //     case 2:
-        //         read();
+            case 2:
+                System.out.println("#------------------------------------#\nLer registro da base.");
+                read();
 
-        //     case 3:
-        //         update();
+            case 3:
+                System.out.println("#------------------------------------#\nAtualizar registro.");
+                update();
 
-        //     case 4:
-        //         delete();
+            case 4:
+                System.out.println("#------------------------------------#\nDeletar registro.");
+                delete();
         
-        //     default:
-        //         break;
-        // }
+            default:
+                break;
+        }
 
 
 
@@ -67,20 +71,20 @@ public class TP {
         sc.close();
     }
 
-    // public static void create(){
+    public static void create(){
+        
+    }
 
-    // }
+    public static void read(){
 
-    // public static void read(){
+    }
 
-    // }
+    public static void update(){
 
-    // public static void update(){
+    }
 
-    // }
+    public static void delete(){
 
-    // public static void delete(){
-
-    // }
+    }
 
 }
