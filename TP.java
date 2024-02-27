@@ -28,6 +28,7 @@ public class TP {
                 programa.ler(arq.readLine());
                 
                 ba = programa.toByteArray();
+                dos.writeBoolean(false);
                 dos.writeInt(ba.length);
                 dos.write(ba);
             }
@@ -40,32 +41,46 @@ public class TP {
         }
         
         System.out.println("#--------------- MENU ---------------#");
-        System.out.println(" Selecione uma das opções: ");
-        System.out.println("1)Adicionar novo registro na base de dados.\n2)Ler registro da base.\n3)Atualizar registro.\n4)Deletar registro. ");
+        System.out.println(" Escolha uma das opções: ");
+        System.out.println("1) Adicionar novo registro na base de dados.\n2) Ler registro da base.\n3) Atualizar registro.\n4) Deletar registro. ");
         
+        // switch (sc.nextInt()) {
+        //     case 1:
+        //         create();
 
+        //     case 2:
+        //         read();
+
+        //     case 3:
+        //         update();
+
+        //     case 4:
+        //         delete();
+        
+        //     default:
+        //         break;
+        // }
 
 
 
 
         sc.close();
     }
-    /* 
-    public static void create(Netflix netflix){
 
-    }
+    // public static void create(){
 
-    public static Netflix read(int id){
+    // }
 
-    }
+    // public static void read(){
 
-    public static boolean update(Netflix netflix){
+    // }
 
-    }
+    // public static void update(){
 
-    public static void delete(int id){
+    // }
 
-    }
-    */
+    // public static void delete(){
+
+    // }
 
 }

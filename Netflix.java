@@ -1,12 +1,13 @@
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Netflix {
     private int id;
-    private String type;
+    private char[] type = new char[7];
     private String title;
     private String director;
     private long date;
@@ -15,7 +16,7 @@ public class Netflix {
 
     }
 
-    public Netflix(int i, String t, String n, String d, long a) {
+    public Netflix(int i, char[] t, String n, String d, long a) {
         this.id = i;
         this.type = t;
         this.title = n;
@@ -32,11 +33,11 @@ public class Netflix {
         this.id = i;
     }
 
-    public String getType() {
+    public char[] getType() {
         return type;
     }
 
-    public void setType(String t) {
+    public void setType(char[] t) {
         this.type = t;
     }
 
@@ -67,7 +68,7 @@ public class Netflix {
     public String toString() {
         return "\nID: " + id +
                 "\nNome: " + title +
-                "\nTipo: " + type +
+                "\nTipo: " + new String(type) +
                 "\nDiretor: " + director +
                 "\nData: " + date;
     }
@@ -106,7 +107,11 @@ public class Netflix {
         }
         
         setId(Integer.parseInt(vetorStr[0]));
-        setType(vetorStr[1]);
+        char[] tipo = new char[7];
+        for(int i = 0; i < vetorStr[1].length(); i++){
+            tipo[i] = vetorStr[1].charAt(i);
+        }
+        setType(tipo);
         setTitle(vetorStr[2]);
         setDirector(vetorStr[3]);
 
@@ -174,8 +179,14 @@ public class Netflix {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
 
+        // Codificação desejada
+        Charset charset = Charset.forName("UTF-8"); // Escolha a codificação desejada
+
+        // Convertendo char array para byte array
+        byte[] byteArray = new String(type).getBytes(charset);
+
         dos.writeInt(id);
-        dos.writeUTF(type);
+        dos.write(byteArray);
         dos.writeUTF(title);
         dos.writeUTF(director);
         dos.writeLong(date);
