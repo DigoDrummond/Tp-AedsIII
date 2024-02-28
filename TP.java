@@ -9,7 +9,7 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class TP {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);
 
         FileOutputStream arqByte;
@@ -34,7 +34,6 @@ public class TP {
                 dos.writeShort(ba.length);
                 dos.write(ba);
             }
-
             dos.close();
             arqByte.close();
             arq.close();
@@ -42,14 +41,21 @@ public class TP {
             System.out.println(e.getMessage() + "\n" + e.getLocalizedMessage());
         }
 
+        menu();
+        sc.close();
+    }
+
+    public static void menu() throws Exception{
+        Scanner sc = new Scanner(System.in);
+
         System.out.println("#--------------- MENU ---------------#");
         System.out.println(" Escolha uma das opções: ");
         System.out.println(
-                "1) Adicionar novo registro na base de dados.\n2) Ler registro da base.\n3) Atualizar registro.\n4) Deletar registro. ");
+                "1) Adicionar novo registro na base de dados\n2) Ler registro da base\n3) Atualizar registro\n4) Deletar registro\n5) Sair\n");
 
         switch (sc.nextInt()) {
             case 1:
-                System.out.println("#------------------------------------#\nAdicionar novo registro na base de dados.");
+                System.out.println("\n#------------------------------------#\nAdicionar novo registro na base de dados");
                 sc.nextLine();
                 String type;
                 while(true){
@@ -82,30 +88,44 @@ public class TP {
                 Netflix novo = new Netflix(tipo, title, director, unixTime);
                 
                 create(novo);
+                menu();
+                break;
 
             case 2:
-                System.out.println("#------------------------------------#\nLer registro da base.");
-                System.out.print("Digite o id da série/ filme que você deseja buscar na base de dados: ");
+                System.out.println("\n#------------------------------------#\nLer registro da base");
+                System.out.print("Digite o id da série/filme que você deseja buscar na base de dados: ");
                 try{
                     Short id = sc.nextShort();
                     read(id);
                 }catch(InputMismatchException e){
                     
                 }
-                
+                menu();
+                break;
 
             case 3:
-                System.out.println("#------------------------------------#\nAtualizar registro.");
+                System.out.println("\n#------------------------------------#\nAtualizar registro.");
                 update();
+                menu();
+                break;
 
             case 4:
-                System.out.println("#------------------------------------#\nDeletar registro.");
+                System.out.println("\n#------------------------------------#\nDeletar registro.");
                 delete();
+                menu();
+                break;
+            
+            case 5:
+                System.out.println("\n#------------------------------------#\nPrograma encerrado.");
+                System.out.println("#------------------------------------#\n");
+                System.exit(0);
+                break;
 
             default:
+                System.out.println("Opção inválida.");
+                menu();
                 break;
         }
-
         sc.close();
     }
 
@@ -124,7 +144,49 @@ public class TP {
 
     }
 
-    public static void read(Short id) {
+    public static void read(Short id) throws Exception {
+        RandomAccessFile arq;
+        try {
+            arq = new RandomAccessFile("data.db", "r");
+            arq.seek(0);
+            long ptr = arq.getFilePointer();
+            boolean lapide;
+            boolean idValido = false;
+
+            while(arq.getFilePointer() < arq.length()){
+                lapide = arq.readBoolean();
+                short tam = arq.readShort();
+                ptr+=3;
+                if(lapide){
+                    ptr+=tam;
+                    arq.seek(ptr);
+                } else {
+                    short idArq = arq.readShort();
+                    if(idArq == id){
+                        arq.seek(ptr);
+                        byte[] ba = new byte[tam];
+                        arq.read(ba);
+                        Netflix programa = new Netflix();
+                        programa.fromByteArray(ba);
+                        System.out.println(programa.toString());
+                        arq.seek(arq.length());
+                        idValido = true;
+                    } else {
+                        ptr+=tam;
+                        arq.seek(ptr);
+                    }
+                }
+            }
+
+            if(idValido == false){
+                System.out.println("\nID não encontrado.\n");
+            }
+
+            arq.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -135,5 +197,6 @@ public class TP {
     public static void delete() {
 
     }
+
 
 }

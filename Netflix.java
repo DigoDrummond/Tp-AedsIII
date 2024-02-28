@@ -1,4 +1,6 @@
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -73,11 +75,14 @@ public class Netflix {
     }
 
     public String toString() {
+        Date data = new Date(date);
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        String dataFormatada = sdf.format(data);
         return "\nID: " + id +
                 "\nNome: " + title +
                 "\nTipo: " + new String(type) +
                 "\nDiretor: " + director +
-                "\nData: " + date;
+                "\nData: " + dataFormatada + "\n";
     }
 
     public void ler(String linha) {
@@ -201,14 +206,17 @@ public class Netflix {
         return baos.toByteArray();
     }
     
-    // public void fromByteArray(byte ba[]) throws IOException{
-    //     ByteArrayInputStream bais = new ByteArrayInputStream(ba);
-    //     DataInputStream dis = new DataInputStream(bais);
+    public void fromByteArray(byte ba[]) throws IOException{
+        ByteArrayInputStream bais = new ByteArrayInputStream(ba);
+        DataInputStream dis = new DataInputStream(bais);
 
-    //     idJogador=dis.readInt();
-    //     nome=dis.readUTF();
-    //     pontos=dis.readFloat();
-
-    // }
+        id = dis.readShort();
+        byte[] byteArray = new byte[7];
+        dis.read(byteArray);
+        type = new String(byteArray).toCharArray();
+        title = dis.readUTF();
+        director = dis.readUTF();
+        date = dis.readLong();
+    }
 
 }
