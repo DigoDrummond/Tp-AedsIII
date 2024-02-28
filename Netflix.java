@@ -16,12 +16,19 @@ public class Netflix {
 
     }
 
-    public Netflix(int i, char[] t, String n, String d, long a) {
+    public Netflix(int i, char[] type, String title, String director, long date) {
         this.id = i;
-        this.type = t;
-        this.title = n;
-        this.director = d;
-        this.date = a;
+        this.type = type;
+        this.title = title;
+        this.director = director;
+        this.date = date;
+
+    }
+    public Netflix(char[] type, String title, String director, long date) {
+        this.type = type;
+        this.title = title;
+        this.director = director;
+        this.date = date;
 
     }
 
@@ -37,32 +44,32 @@ public class Netflix {
         return type;
     }
 
-    public void setType(char[] t) {
-        this.type = t;
+    public void setType(char[] type) {
+        this.type = type;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public void setTitle(String n) {
-        this.title = n;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getDirector() {
         return director;
     }
 
-    public void setDirector(String d) {
-        this.director = d;
+    public void setDirector(String director) {
+        this.director = director;
     }
 
     public long getDate() {
         return date;
     }
 
-    public void setDate(long a) {
-        this.date = a;
+    public void setDate(long date) {
+        this.date = date;
     }
 
     public String toString() {
