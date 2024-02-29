@@ -9,6 +9,7 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class TP {
+    public static short ultimoId = 8810;
     public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);
 
@@ -25,6 +26,7 @@ public class TP {
             byte[] ba;
 
             arq.readLine();
+            //dos.writeInt(ultimoId);
             while (arq.ready()) {
                 Netflix programa = new Netflix();
                 programa.ler(arq.readLine());
@@ -82,7 +84,7 @@ public class TP {
                 }
 
                 char[] tipo = new char[7];
-                for (int i = 0; i < tipo.length; i++) {
+                for (int i = 0; i < type.length(); i++) {
                     tipo[i] = type.charAt(i);
                 }
                 Netflix novo = new Netflix(tipo, title, director, unixTime);
@@ -132,10 +134,16 @@ public class TP {
     public static void create(Netflix netflix) {
         RandomAccessFile arq;
         try {
-            arq = new RandomAccessFile("netflix.csv", "rw");
-            arq.seek(0);
-            long ptr = arq.getFilePointer();
-
+            arq = new RandomAccessFile("data.db", "rw");
+            byte[] ba;
+            arq.seek(arq.length());
+            ultimoId++;
+            netflix.setId(ultimoId);
+            ba = netflix.toByteArray();
+            arq.writeBoolean(false);
+            arq.writeShort(ba.length);
+            arq.write(ba);
+            
             arq.close();
 
         } catch (Exception e) {
