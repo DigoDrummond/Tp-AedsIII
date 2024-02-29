@@ -82,7 +82,7 @@ public class TP {
                 } else {
                     type = "Movie";
                 }
-                System.out.print("Nome: ");
+                System.out.print("Titulo: ");
                 String title = sc.nextLine();
                 System.out.print("Diretor: ");
                 String director = sc.nextLine();
