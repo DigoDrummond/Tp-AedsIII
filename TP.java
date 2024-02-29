@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.Scanner;
 
 public class TP {
-    public static short ultimoId = 8810;
     public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);
 
@@ -53,6 +52,7 @@ public class TP {
         sc.close();
     }
 
+    //função menu
     public static void menu() throws Exception{
         Scanner sc = new Scanner(System.in);
 
@@ -63,14 +63,24 @@ public class TP {
 
         switch (sc.nextInt()) {
             case 1:
+                //Montando o objeto Netflix para enviar para a função create
                 System.out.println("\n#------------------------------------#\nAdicionar novo registro na base de dados");
                 sc.nextLine();
                 String type;
+                int selecao;
                 while(true){
-                    System.out.print("Tipo(TV Show / Movie): ");
-                    type = sc.nextLine();
-                    if(type.equals("TV Show") || type.equals("Movie"))
+                    System.out.print("Selecione o tipo [ TV Show(1) / Movie(2) ]: ");
+                    selecao = sc.nextInt();
+                    if(selecao == 1 || selecao == 2){
                         break;
+                    } else {
+                        System.out.println("Opção inválida.");
+                    }
+                }
+                if(selecao == 1){
+                    type = "TV Show";
+                } else {
+                    type = "Movie";
                 }
                 System.out.print("Nome: ");
                 String title = sc.nextLine();
@@ -95,6 +105,7 @@ public class TP {
                 }
                 Netflix novo = new Netflix(tipo, title, director, unixTime);
                 
+                //Chamando a função create com o objeto montado
                 create(novo);
                 menu();
                 break;
@@ -119,7 +130,7 @@ public class TP {
 
             case 4:
                 System.out.println("\n#------------------------------------#\nDeletar registro.");
-                System.out.println("Digite o id do registro que você deseja deletar: ");
+                System.out.print("Digite o id do registro que você deseja deletar: ");
                 try {
                     int id = sc.nextInt();
                     delete(id);
@@ -148,9 +159,14 @@ public class TP {
         try {
             arq = new RandomAccessFile("data.db", "rw");
             byte[] ba;
-            arq.seek(arq.length());
+            arq.seek(0);
+            int ultimoId = arq.readInt();
             ultimoId++;
+            arq.seek(0);
+            arq.writeInt(ultimoId);
             netflix.setId(ultimoId);
+            
+            arq.seek(arq.length());
             ba = netflix.toByteArray();
             arq.writeBoolean(false);
             arq.writeShort(ba.length);
@@ -170,11 +186,10 @@ public class TP {
             arq = new RandomAccessFile("data.db", "rw");
             arq.seek(4);
             long ptr = arq.getFilePointer();
-            boolean lapide;
             boolean idValido = false;
 
             while(arq.getFilePointer() < arq.length()){
-                lapide = arq.readBoolean();
+                boolean lapide = arq.readBoolean();
                 short tam = arq.readShort();
                 ptr+=3;
                 if(lapide){
@@ -215,7 +230,45 @@ public class TP {
     }
 
     public static void delete(int id) throws Exception {
-        
+        RandomAccessFile arq;
+        try {
+            arq = new RandomAccessFile("data.db", "rw");
+            arq.seek(4);
+            long ptr = arq.getFilePointer();
+            boolean idValido = false;
+
+            while(arq.getFilePointer() < arq.length()){
+                boolean lapide = arq.readBoolean();
+                short tam = arq.readShort();
+                ptr+=3;
+                if(lapide){
+                    ptr+=tam;
+                    arq.seek(ptr);
+                } else {
+                    int idArq = arq.readInt();
+                    if(idArq == id){
+                        ptr-=3;
+                        arq.seek(ptr);
+                        arq.writeBoolean(true);
+                        arq.seek(arq.length());
+                        idValido = true;
+                        System.out.println("\nRegistro deletado com sucesso.\n");
+                    } else {
+                        ptr+=tam;
+                        arq.seek(ptr);
+                    }
+                }
+            }
+
+            if(idValido == false){
+                System.out.println("\nID não encontrado.\n");
+            }
+
+            arq.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
