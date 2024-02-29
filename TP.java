@@ -26,7 +26,8 @@ public class TP {
             byte[] ba;
 
             arq.readLine();
-            //dos.writeInt(ultimoId);
+            dos.writeShort(0);
+            int idFinal = 0;
             while (arq.ready()) {
                 Netflix programa = new Netflix();
                 programa.ler(arq.readLine());
@@ -35,7 +36,13 @@ public class TP {
                 dos.writeBoolean(false);
                 dos.writeShort(ba.length);
                 dos.write(ba);
+                idFinal = programa.getId();
             }
+            RandomAccessFile start = new RandomAccessFile("data.db", "rw");
+            start.seek(0);
+            start.writeShort(idFinal);
+            start.close();
+
             dos.close();
             arqByte.close();
             arq.close();
@@ -156,7 +163,7 @@ public class TP {
         RandomAccessFile arq;
         try {
             arq = new RandomAccessFile("data.db", "r");
-            arq.seek(0);
+            arq.seek(2);
             long ptr = arq.getFilePointer();
             boolean lapide;
             boolean idValido = false;
