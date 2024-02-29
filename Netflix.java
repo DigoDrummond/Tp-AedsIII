@@ -85,11 +85,13 @@ public class Netflix {
                 "\nData: " + dataFormatada + "\n";
     }
 
+    //le linha do arquivo .csv e seta atributos da classe
     public void ler(String linha) {
         int j = 0;
 		char c = ';';
 		int tmp = 0;
 		String vetorStr[] = new String[5];
+        //separa atributos de cada linha do .csv usando ; como separador
 		for(int i=0; i<linha.length(); i++){
 			if(linha.charAt(i) == c) {
 				vetorStr[j] =linha.substring(tmp, i);
@@ -101,8 +103,10 @@ public class Netflix {
 			}
 		}
 		vetorStr[4] =linha.substring(tmp, linha.length());
+        //seta data ara 0 milisegundos se campo estiver vazio
         if(vetorStr[4].intern() == ""){
             setDate(0);
+        //se data não estiver vazio usa função formatar data para transformar formato do .csv no formato dd/MM/yyyy
 		} else {
             String data = formatarData(vetorStr[4]);
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
@@ -117,18 +121,22 @@ public class Netflix {
             }
             setDate(unixTime);
         }
-        
+        //seta atributo id
         setId(Integer.parseInt(vetorStr[0]));
+
+        //atribui valores do campo tipo a um vetor de tamanho fixo
         char[] tipo = new char[7];
         for(int i = 0; i < vetorStr[1].length(); i++){
             tipo[i] = vetorStr[1].charAt(i);
         }
-        setType(tipo);
-        setTitle(vetorStr[2]);
-        setDirector(vetorStr[3]);
+        setType(tipo);//seta atributo tipo de acordo com vetor de char acima
+        setTitle(vetorStr[2]);//seta atributo titulo
+        setDirector(vetorStr[3]);//seta atributo diretor 
 
     }
 
+    //função interna do programa específica para transformar a data do arquvo .csv em uma data padrão dd/Mm/yyyy
+    //ex: October 28, 2004 em 28/10/2004
     private static String formatarData(String dataOriginal) {
         String[] partes = dataOriginal.split(" ");
         if(partes[0].equals("")){
