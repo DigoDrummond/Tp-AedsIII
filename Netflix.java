@@ -197,7 +197,7 @@ public class Netflix {
         // Convertendo char array para byte array
         byte[] byteArray = new String(type).getBytes(charset);
 
-        dos.writeShort(id);
+        dos.writeInt(id);
         dos.write(byteArray);
         dos.writeUTF(title);
         dos.writeUTF(director);
@@ -210,7 +210,7 @@ public class Netflix {
         ByteArrayInputStream bais = new ByteArrayInputStream(ba);
         DataInputStream dis = new DataInputStream(bais);
 
-        id = dis.readShort();
+        id = dis.readInt();
         byte[] byteArray = new byte[7];
         dis.read(byteArray);
         type = new String(byteArray).toCharArray();

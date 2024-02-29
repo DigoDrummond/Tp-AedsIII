@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.io.RandomAccessFile;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class TP {
@@ -26,7 +25,7 @@ public class TP {
             byte[] ba;
 
             arq.readLine();
-            dos.writeShort(0);
+            dos.writeInt(0);
             int idFinal = 0;
             while (arq.ready()) {
                 Netflix programa = new Netflix();
@@ -40,7 +39,7 @@ public class TP {
             }
             RandomAccessFile start = new RandomAccessFile("data.db", "rw");
             start.seek(0);
-            start.writeShort(idFinal);
+            start.writeInt(idFinal);
             start.close();
 
             dos.close();
@@ -104,10 +103,10 @@ public class TP {
                 System.out.println("\n#------------------------------------#\nLer registro da base");
                 System.out.print("Digite o id da série/filme que você deseja buscar na base de dados: ");
                 try{
-                    Short id = sc.nextShort();
+                    int id = sc.nextInt();
                     read(id);
-                }catch(InputMismatchException e){
-                    
+                }catch(Exception e){
+                    System.out.println("ID inválido.");
                 }
                 menu();
                 break;
@@ -120,7 +119,13 @@ public class TP {
 
             case 4:
                 System.out.println("\n#------------------------------------#\nDeletar registro.");
-                delete();
+                System.out.println("Digite o id do registro que você deseja deletar: ");
+                try {
+                    int id = sc.nextInt();
+                    delete(id);
+                } catch (Exception e) {
+                    System.out.println("ID inválido.");
+                }
                 menu();
                 break;
             
@@ -138,7 +143,7 @@ public class TP {
         sc.close();
     }
 
-    public static void create(Netflix netflix) {
+    public static void create(Netflix netflix) throws Exception{
         RandomAccessFile arq;
         try {
             arq = new RandomAccessFile("data.db", "rw");
@@ -159,11 +164,11 @@ public class TP {
 
     }
 
-    public static void read(Short id) throws Exception {
+    public static void read(int id) throws Exception {
         RandomAccessFile arq;
         try {
-            arq = new RandomAccessFile("data.db", "r");
-            arq.seek(2);
+            arq = new RandomAccessFile("data.db", "rw");
+            arq.seek(4);
             long ptr = arq.getFilePointer();
             boolean lapide;
             boolean idValido = false;
@@ -176,7 +181,7 @@ public class TP {
                     ptr+=tam;
                     arq.seek(ptr);
                 } else {
-                    short idArq = arq.readShort();
+                    int idArq = arq.readInt();
                     if(idArq == id){
                         arq.seek(ptr);
                         byte[] ba = new byte[tam];
@@ -209,8 +214,8 @@ public class TP {
 
     }
 
-    public static void delete() {
-
+    public static void delete(int id) throws Exception {
+        
     }
 
 
