@@ -52,8 +52,8 @@ public class TP {
         sc.close();
     }
 
-    //função menu
-    public static void menu() throws Exception{
+    // função menu
+    public static void menu() throws Exception {
         Scanner sc = new Scanner(System.in);
 
         System.out.println("#--------------- MENU ---------------#");
@@ -62,51 +62,52 @@ public class TP {
 
         switch (sc.nextInt()) {
             case 1:
-                //Montando o objeto Netflix para enviar para a função create
-                System.out.println("\n#------------------------------------#\nAdicionar novo registro na base de dados");
+                // Montando o objeto Netflix para enviar para a função create
+                System.out
+                        .println("\n#------------------------------------#\nAdicionar novo registro na base de dados");
                 sc.nextLine();
                 String type;
                 int selecao;
-                //permite que usuário escolha somente uma das duas opções
-                while(true){
+                // permite que usuário escolha somente uma das duas opções
+                while (true) {
                     System.out.print("Selecione o tipo [ TV Show(1) / Movie(2) ]: ");
                     selecao = sc.nextInt();
-                    if(selecao == 1 || selecao == 2){
+                    if (selecao == 1 || selecao == 2) {
                         break;
                     } else {
                         System.out.println("Opção inválida.");
                     }
                 }
-                if(selecao == 1){
+                if (selecao == 1) {
                     type = "TV Show";
                 } else {
                     type = "Movie";
                 }
-                sc.nextLine();//pega \n entre leitura de int e string
+                sc.nextLine();// pega \n entre leitura de int e string
                 System.out.print("Titulo: ");
                 String title = sc.nextLine();
                 System.out.print("Diretor: ");
                 String director = sc.nextLine();
                 System.out.print("Data de lançamento(dd/MM/yyyy): ");
-                // le data 
+                // le data
                 String data = sc.nextLine();
-                //formata data digitada
+                // formata data digitada
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                 Date dataFormatada = new Date();
-                //trasforma data em long para ser armazenado no objeto
+                // trasforma data em long para ser armazenado no objeto
                 long unixTime = 0;
                 dataFormatada = sdf.parse(data);
                 unixTime = dataFormatada.getTime();
-                
-                //coloca atributo tipo em vetor de tamanho fixo 
+
+                // coloca atributo tipo em vetor de tamanho fixo
                 char[] tipo = new char[7];
                 for (int i = 0; i < type.length(); i++) {
                     tipo[i] = type.charAt(i);
                 }
-                //cria novo objeto Netflix
+                // cria novo objeto Netflix
                 Netflix novo = new Netflix(tipo, title, director, unixTime);
-                
-                //Chamando a função create com o objeto montado
+
+                // Chamando a função create com o objeto montado
                 create(novo);
                 menu();
                 break;
@@ -114,27 +115,67 @@ public class TP {
             case 2:
                 System.out.println("\n#------------------------------------#\nLer registro da base");
                 System.out.print("Digite o id da série/filme que você deseja buscar na base de dados: ");
-                    int id = lerInteiro(sc);
-                    read(id);
-                
+                int id = lerInteiro(sc);
+                read(id);
+
                 menu();
                 break;
 
             case 3:
                 System.out.println("\n#------------------------------------#\nAtualizar registro.");
-                update();
+                System.out.print("Digite o id do registro que você deseja atualizar: ");
+                id = lerInteiro(sc);
+                // permite que usuário escolha somente uma das duas opções
+                while (true) {
+                    System.out.print("Selecione o tipo [ TV Show(1) / Movie(2) ]: ");
+                    selecao = sc.nextInt();
+                    if (selecao == 1 || selecao == 2) {
+                        break;
+                    } else {
+                        System.out.println("Opção inválida.");
+                    }
+                }
+                if (selecao == 1) {
+                    type = "TV Show";
+                } else {
+                    type = "Movie";
+                }
+                sc.nextLine();// pega \n entre leitura de int e string
+                System.out.print("Titulo: ");
+                title = sc.nextLine();
+                System.out.print("Diretor: ");
+                director = sc.nextLine();
+                System.out.print("Data de lançamento(dd/MM/yyyy): ");
+                // le data
+                data = sc.nextLine();
+                // formata data digitada
+                sdf = new SimpleDateFormat("dd/MM/yyyy");
+                dataFormatada = new Date();
+                // trasforma data em long para ser armazenado no objeto
+                unixTime = 0;
+                dataFormatada = sdf.parse(data);
+                unixTime = dataFormatada.getTime();
+
+                // coloca atributo tipo em vetor de tamanho fixo
+                tipo = new char[7];
+                for (int i = 0; i < type.length(); i++) {
+                    tipo[i] = type.charAt(i);
+                }
+                // cria novo objeto Netflix
+                Netflix atualizado = new Netflix(id, tipo, title, director, unixTime);
+                update(atualizado);
                 menu();
                 break;
 
             case 4:
                 System.out.println("\n#------------------------------------#\nDeletar registro.");
                 System.out.print("Digite o id do registro que você deseja deletar: ");
-                    id = lerInteiro(sc);
-                    delete(id);
-               
+                id = lerInteiro(sc);
+                delete(id);
+
                 menu();
                 break;
-            
+
             case 5:
                 System.out.println("\n#------------------------------------#\nPrograma encerrado.");
                 System.out.println("#------------------------------------#\n");
@@ -149,7 +190,7 @@ public class TP {
         sc.close();
     }
 
-    public static void create(Netflix netflix) throws Exception{
+    public static void create(Netflix netflix) throws Exception {
         RandomAccessFile arq;
         try {
             arq = new RandomAccessFile("data.db", "rw");
@@ -160,13 +201,13 @@ public class TP {
             arq.seek(0);
             arq.writeInt(ultimoId);
             netflix.setId(ultimoId);
-            
+
             arq.seek(arq.length());
             ba = netflix.toByteArray();
             arq.writeBoolean(false);
             arq.writeShort(ba.length);
             arq.write(ba);
-            
+
             arq.close();
 
         } catch (Exception e) {
@@ -179,24 +220,25 @@ public class TP {
         RandomAccessFile arq;
         try {
             arq = new RandomAccessFile("data.db", "rw");
-            //move ponteiro do arquivo para priemeiro registro, pulando byts de registro do último id registrado
+            // move ponteiro do arquivo para priemeiro registro, pulando byts de registro do
+            // último id registrado
             arq.seek(4);
             long ptr = arq.getFilePointer();
             boolean idValido = false;
 
-            while(arq.getFilePointer() < arq.length()){
+            while (arq.getFilePointer() < arq.length()) {
                 boolean lapide = arq.readBoolean();
                 short tam = arq.readShort();
-                ptr+=3;
-                 //se for lapide pega tamanho do registro e pula para próximo
-                if(lapide){
-                    ptr+=tam;
+                ptr += 3;
+                // se for lapide pega tamanho do registro e pula para próximo
+                if (lapide) {
+                    ptr += tam;
                     arq.seek(ptr);
                 } else {
                     int idArq = arq.readInt();
-                    //se id for encontrado
-                    if(idArq == id){
-                        arq.seek(ptr); //move ponteiro para registro correto
+                    // se id for encontrado
+                    if (idArq == id) {
+                        arq.seek(ptr);
                         byte[] ba = new byte[tam];
                         arq.read(ba);
                         Netflix programa = new Netflix();
@@ -204,15 +246,15 @@ public class TP {
                         System.out.println(programa.toString());
                         arq.seek(arq.length());
                         idValido = true;
-                     // se não for igual ao procurado
+                        // se não for igual ao procurado
                     } else {
-                        ptr+=tam;
+                        ptr += tam;
                         arq.seek(ptr);
                     }
                 }
             }
-            //se id procurado não for encontrado
-            if(idValido == false){
+            // se id procurado não for encontrado
+            if (!idValido) {
                 System.out.println("\nID não encontrado.\n");
             }
 
@@ -224,47 +266,106 @@ public class TP {
 
     }
 
-    public static void update() {
+    public static void update(Netflix netflix) {
+        RandomAccessFile arq;
+        try {
+            arq = new RandomAccessFile("data.db", "rw");
+            // transforma objeto em vetor de bytes
+            byte[] ba = netflix.toByteArray();
+            // vai para primeiro registro,pulando registro do ultimo id
+            arq.seek(4);
+            long ptr = arq.getFilePointer();
 
+            boolean inserido = false;// variável para verificar se objeto atualizado foi inserido durante while
+            while (arq.getFilePointer() < arq.length()) {
+                boolean lapide = arq.readBoolean();
+                short tam = arq.readShort();
+                short tamNetflix = (short) ba.length;
+                ptr += 3;// pula lapide e tamanho do registro
+                // se for lapide verifica se tamanho do espaço é igual ou maior ao do novo
+                // registro
+                if (lapide) {
+                    ptr += tam;
+                    arq.seek(ptr);
+                } else {
+                    int idArq = arq.readInt();// pega id do registro atual
+                    if (idArq == netflix.getId()) {
+                        if (tam >= tamNetflix) {
+                            arq.seek(ptr);
+                            arq.write(ba);
+                            inserido = true;
+                            System.out.println("Registro atualizado com sucesso1!");
+                            arq.seek(arq.length());// break
+                        } else {//coloca lapide no registro que será atualizado, pois se cair no else ele será inserido no final
+                            ptr-=3;
+                            arq.seek(ptr);
+                            arq.writeBoolean(false);
+                            ptr+=3;
+                            arq.seek(ptr);
+                        }
+                    } else {
+
+                        ptr += tam;
+                        arq.seek(tam);
+                    }
+                }
+            }
+            // se registro não foi inserido durante em posição no meio do .db, inserir no
+            // final
+            if (!inserido) {
+                arq.seek(arq.length());
+                arq.writeBoolean(false);// lapide
+                arq.writeInt(ba.length);
+                arq.write(ba);
+                System.out.println("Registro atualizado com sucesso1!");
+
+            }
+
+            arq.close();
+
+        } catch (Exception e) {
+
+        }
     }
 
     public static void delete(int id) throws Exception {
         RandomAccessFile arq;
         try {
             arq = new RandomAccessFile("data.db", "rw");
-            //move ponteiro do arquivo para priemeiro registro, pulando byts de registro do último id registrado
+            // move ponteiro do arquivo para priemeiro registro, pulando byts de registro do
+            // último id registrado
             arq.seek(4);
             long ptr = arq.getFilePointer();
             boolean idValido = false;
 
-            while(arq.getFilePointer() < arq.length()){
+            while (arq.getFilePointer() < arq.length()) {
                 boolean lapide = arq.readBoolean();
                 short tam = arq.readShort();
-                ptr+=3;
-                //se for lapide pega tamanho do registro e pula para próximo
-                if(lapide){
-                    ptr+=tam;
+                ptr += 3;
+                // se for lapide pega tamanho do registro e pula para próximo
+                if (lapide) {
+                    ptr += tam;
                     arq.seek(ptr);
-                //se não for lápide
+                    // se não for lápide
                 } else {
                     int idArq = arq.readInt();
-                    //se id for encontrado
-                    if(idArq == id){
-                        ptr-=3;
-                        arq.seek(ptr);//move ponteiro para inicio do registro
+                    // se id for encontrado
+                    if (idArq == id) {
+                        ptr -= 3;
+                        arq.seek(ptr);// move ponteiro para inicio do registro
                         arq.writeBoolean(true);
                         arq.seek(arq.length());
                         idValido = true;
                         System.out.println("\nRegistro deletado com sucesso.\n");
-                    // se não for igual ao procurado
+                        // se não for igual ao procurado
                     } else {
-                        ptr+=tam;
+                        ptr += tam;
                         arq.seek(ptr);
                     }
                 }
             }
-            //caso não encontre o id procurado
-            if(idValido == false){
+            // caso não encontre o id procurado
+            if (idValido == false) {
                 System.out.println("\nID não encontrado.\n");
             }
 
@@ -275,8 +376,9 @@ public class TP {
         }
     }
 
-    //função interna do programa para verificar se id digitado pelo usuário é valido
-    //prende em looping até digitar valor válido
+    // função interna do programa para verificar se id digitado pelo usuário é
+    // valido
+    // prende em looping até digitar valor válido
     private static int lerInteiro(Scanner scanner) {
         while (!scanner.hasNextInt()) {
             System.out.println("Isso não é um número inteiro.");
@@ -285,6 +387,5 @@ public class TP {
         }
         return scanner.nextInt();
     }
-
 
 }
