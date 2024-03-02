@@ -60,14 +60,14 @@ public class TP {
         Scanner sc = new Scanner(System.in);
 
         System.out.println("#--------------- MENU ---------------#");
-        System.out.print(
-                "\n1) Adicionar novo registro na base de dados\n2) Ler registro da base\n3) Atualizar registro\n4) Deletar registro\n5) Sair\n Opção: ");
+        System.out.print("\n1) Adicionar novo registro na base de dados\n2) Ler registro da base\n3) Atualizar registro\n4) Deletar registro\n5) Sair\n Opção: ");
 
         switch (sc.nextInt()) {
+            //Create
             case 1:
                 // Montando o objeto Netflix para enviar para a função create
-                System.out
-                        .println("\n#------------------------------------#\nAdicionar novo registro na base de dados");
+                System.out.println("\n#------------------------------------#");
+                System.out.println("Adicionar novo registro na base de dados");
                 sc.nextLine();
                 String type;
                 int selecao;
@@ -86,13 +86,16 @@ public class TP {
                 } else {
                     type = "Movie";
                 }
+
                 sc.nextLine();// pega \n entre leitura de int e string
+                //titulo
                 System.out.print("Titulo: ");
                 String title = sc.nextLine();
+                //diretor
                 System.out.print("Diretor: ");
                 String director = sc.nextLine();
+                //data
                 System.out.print("Data de lançamento(dd/MM/yyyy): ");
-                // le data
                 String data = sc.nextLine();
                 // formata data digitada
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
@@ -115,6 +118,7 @@ public class TP {
                 menu();
                 break;
 
+            //Read
             case 2:
                 System.out.println("\n#------------------------------------#\nLer registro da base");
                 System.out.print("Digite o id da série/filme que você deseja buscar na base de dados: ");
@@ -124,6 +128,7 @@ public class TP {
                 menu();
                 break;
 
+            //Update    
             case 3:
                 System.out.println("\n#------------------------------------#\nAtualizar registro.");
                 System.out.print("Digite o id do registro que você deseja atualizar: ");
@@ -170,6 +175,8 @@ public class TP {
                 menu();
                 break;
 
+
+            //Delete
             case 4:
                 System.out.println("\n#------------------------------------#\nDeletar registro.");
                 System.out.print("Digite o id do registro que você deseja deletar: ");
@@ -185,6 +192,7 @@ public class TP {
                 System.exit(0);
                 break;
 
+            //
             default:
                 System.out.println("Opção inválida.");
                 menu();
@@ -199,17 +207,19 @@ public class TP {
             arq = new RandomAccessFile("data.db", "rw");
             byte[] ba;
             arq.seek(0);
+            //pega ultimo id do .db e o atualiza
             int ultimoId = arq.readInt();
             ultimoId++;
             arq.seek(0);
             arq.writeInt(ultimoId);
+
             netflix.setId(ultimoId);
 
-            arq.seek(arq.length());
+            arq.seek(arq.length());//ponteiro para final do arquivo 
             ba = netflix.toByteArray();
-            arq.writeBoolean(false);
-            arq.writeShort(ba.length);
-            arq.write(ba);
+            arq.writeBoolean(false);//não é lapide
+            arq.writeShort(ba.length);//tamanho do novo registro
+            arq.write(ba);//registro
 
             arq.close();
 
@@ -223,8 +233,7 @@ public class TP {
         RandomAccessFile arq;
         try {
             arq = new RandomAccessFile("data.db", "rw");
-            // move ponteiro do arquivo para priemeiro registro, pulando byts de registro do
-            // último id registrado
+            // move ponteiro do arquivo para priemeiro registro, pulando byts de registro do último id registrado
             arq.seek(4);
             long ptr = arq.getFilePointer();
             boolean idValido = false;
@@ -232,7 +241,7 @@ public class TP {
             while (arq.getFilePointer() < arq.length()) {
                 boolean lapide = arq.readBoolean();
                 short tam = arq.readShort();
-                ptr += 3;
+                ptr += 3;//ponteiro para inicio do registro
                 // se for lapide pega tamanho do registro e pula para próximo
                 if (lapide) {
                     ptr += tam;
@@ -244,12 +253,14 @@ public class TP {
                         arq.seek(ptr);
                         byte[] ba = new byte[tam];
                         arq.read(ba);
+                        //Novo objeto netflix recebe registro lido
                         Netflix programa = new Netflix();
                         programa.fromByteArray(ba);
+
                         System.out.println(programa.toString());
-                        arq.seek(arq.length());
+                        arq.seek(arq.length());//condição de parada
                         idValido = true;
-                        // se não for igual ao procurado
+                        // se não for igual ao procurado ponteiro aponta para próximo registro
                     } else {
                         ptr += tam;
                         arq.seek(ptr);
@@ -273,17 +284,20 @@ public class TP {
         RandomAccessFile arq;
         try {
             arq = new RandomAccessFile("data.db", "rw");
-            byte[] ba = netflix.toByteArray();
+            byte[] ba = netflix.toByteArray();//transforma objeto em vetor de bytes
             arq.seek(4); // Pula o ID final armazenado no início do arquivo
-            boolean encontrado = false;
-            boolean atualizado = false;
+
+            boolean encontrado = false;//verifica se objeto com id desejado existe
+            boolean atualizado = false;//verifica se registro foi atualizado
 
             while (arq.getFilePointer() < arq.length() && !atualizado) {
+                //aponta para primeiro registro
                 long inicioRegistro = arq.getFilePointer();
                 boolean lapide = arq.readBoolean();
                 short tamanhoRegistro = arq.readShort();
 
                 if (!lapide) {
+                    //se registro não for lápide, verifica se ele é o correto de acordo com id
                     int idArq = arq.readInt();
                     if (idArq == netflix.getId()) {
                         encontrado = true;
@@ -299,7 +313,7 @@ public class TP {
                         }else{
                             //se id for encontrado mas registro for maior que antigo, marca antigo como lápide
                             arq.seek(inicioRegistro);
-                            arq.writeBoolean(true);
+                            arq.writeBoolean(true);//atualiza registro desatualizado para lápide, para evitar conflito na leitura
                         }
                         break; // Sai do loop se o registro foi encontrado, independentemente de atualizado ou não
                                
@@ -331,8 +345,7 @@ public class TP {
         RandomAccessFile arq;
         try {
             arq = new RandomAccessFile("data.db", "rw");
-            // move ponteiro do arquivo para priemeiro registro, pulando byts de registro do
-            // último id registrado
+            // move ponteiro do arquivo para priemeiro registro, pulando byts de registro do último id registrado
             arq.seek(4);
             long ptr = arq.getFilePointer();
             boolean idValido = false;
@@ -375,16 +388,14 @@ public class TP {
         }
     }
 
-    // função interna do programa para verificar se id digitado pelo usuário é
-    // valido
-    // prende em looping até digitar valor válido
-    private static int lerInteiro(Scanner scanner) {
-        while (!scanner.hasNextInt()) {
+    // função interna do programa para verificar se id digitado pelo usuário é valido, prende em looping até digitar valor válido
+    private static int lerInteiro(Scanner sc) {
+        while (!sc.hasNextInt()) {
             System.out.println("Isso não é um número inteiro.");
             System.out.print("Insira um valor válido: ");
-            scanner.next(); // Consume o valor não inteiro para evitar um loop infinito
+            sc.next(); // Consume o valor não inteiro para evitar um loop infinito
         }
-        return scanner.nextInt();
+        return sc.nextInt();
     }
 
 }

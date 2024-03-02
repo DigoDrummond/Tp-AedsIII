@@ -18,14 +18,15 @@ public class Netflix {
 
     }
 
-    public Netflix(int i, char[] type, String title, String director, long date) {
-        this.id = i;
+    public Netflix(int id, char[] type, String title, String director, long date) {
+        this.id = id;
         this.type = type;
         this.title = title;
         this.director = director;
         this.date = date;
 
     }
+    //construtor para método create, que atribui id novo de acordo com antigo último
     public Netflix(char[] type, String title, String director, long date) {
         this.type = type;
         this.title = title;
@@ -38,8 +39,8 @@ public class Netflix {
         return id;
     }
 
-    public void setId(int i) {
-        this.id = i;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public char[] getType() {
@@ -103,7 +104,7 @@ public class Netflix {
 			}
 		}
 		vetorStr[4] =linha.substring(tmp, linha.length());
-        //seta data ara 0 milisegundos se campo estiver vazio
+        //seta data para 0 milisegundos se campo estiver vazio
         if(vetorStr[4].intern() == ""){
             setDate(0);
         //se data não estiver vazio usa função formatar data para transformar formato do .csv no formato dd/MM/yyyy
