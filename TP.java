@@ -1,3 +1,6 @@
+//Rodrigo Drummond e Tiago Lascasas
+//https://github.com/DigoDrummond/Tp-AedsIII
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.FileOutputStream;
@@ -270,61 +273,57 @@ public class TP {
         RandomAccessFile arq;
         try {
             arq = new RandomAccessFile("data.db", "rw");
-            // transforma objeto em vetor de bytes
             byte[] ba = netflix.toByteArray();
-            // vai para primeiro registro,pulando registro do ultimo id
-            arq.seek(4);
-            long ptr = arq.getFilePointer();
+            arq.seek(4); // Pula o ID final armazenado no início do arquivo
+            boolean encontrado = false;
+            boolean atualizado = false;
 
-            boolean inserido = false;// variável para verificar se objeto atualizado foi inserido durante while
-            while (arq.getFilePointer() < arq.length()) {
+            while (arq.getFilePointer() < arq.length() && !atualizado) {
+                long inicioRegistro = arq.getFilePointer();
                 boolean lapide = arq.readBoolean();
-                short tam = arq.readShort();
-                short tamNetflix = (short) ba.length;
-                ptr += 3;// pula lapide e tamanho do registro
-                // se for lapide verifica se tamanho do espaço é igual ou maior ao do novo
-                // registro
-                if (lapide) {
-                    ptr += tam;
-                    arq.seek(ptr);
-                } else {
-                    int idArq = arq.readInt();// pega id do registro atual
-                    if (idArq == netflix.getId()) {
-                        if (tam >= tamNetflix) {
-                            arq.seek(ptr);
-                            arq.write(ba);
-                            inserido = true;
-                            System.out.println("Registro atualizado com sucesso1!");
-                            arq.seek(arq.length());// break
-                        } else {//coloca lapide no registro que será atualizado, pois se cair no else ele será inserido no final
-                            ptr-=3;
-                            arq.seek(ptr);
-                            arq.writeBoolean(false);
-                            ptr+=3;
-                            arq.seek(ptr);
-                        }
-                    } else {
+                short tamanhoRegistro = arq.readShort();
 
-                        ptr += tam;
-                        arq.seek(tam);
+                if (!lapide) {
+                    int idArq = arq.readInt();
+                    if (idArq == netflix.getId()) {
+                        encontrado = true;
+                        // Verifica se o tamanho do novo registro é menor ou igual ao do registro atual
+                        if (tamanhoRegistro >= ba.length) {
+                            // Posiciona o ponteiro para o início do registro considerando lápide e tamanho
+                            arq.seek(inicioRegistro);
+                            arq.writeBoolean(false); // Mantém a lápide como falsa
+                            arq.writeShort(ba.length); // Atualiza o tamanho se necessário
+                            arq.write(ba); // Escreve o novo registro sobre o antigo
+                            atualizado = true;
+                            System.out.println("Registro atualizado com sucesso!");
+                        }else{
+                            //se id for encontrado mas registro for maior que antigo, marca antigo como lápide
+                            arq.seek(inicioRegistro);
+                            arq.writeBoolean(true);
+                        }
+                        break; // Sai do loop se o registro foi encontrado, independentemente de atualizado ou não
+                               
                     }
                 }
+                // Move o ponteiro para o próximo registro se não for o registro a atualizar
+                arq.seek(inicioRegistro + 3 + tamanhoRegistro);
             }
-            // se registro não foi inserido durante em posição no meio do .db, inserir no
-            // final
-            if (!inserido) {
-                arq.seek(arq.length());
-                arq.writeBoolean(false);// lapide
-                arq.writeInt(ba.length);
-                arq.write(ba);
-                System.out.println("Registro atualizado com sucesso1!");
 
+            if (!atualizado && encontrado) {
+                // Se o registro foi encontrado mas não atualizado devido ao tamanho, marca o
+                // antigo como removido e adiciona o novo ao final
+                arq.seek(arq.length());
+                arq.writeBoolean(false); // Lápide para o novo registro
+                arq.writeShort(ba.length); // Tamanho do novo registro
+                arq.write(ba); // Dados do novo registro
+                System.out.println("Registro atualizado e movido para o final do arquivo.");
+            } else if (!encontrado) {
+                System.out.println("Registro com o ID especificado não encontrado.");
             }
 
             arq.close();
-
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
 
